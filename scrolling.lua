@@ -5,7 +5,7 @@ local font = love.graphics.newFont("arial.ttf", 16)
 --visible region offsets
 local rx = 0
 local ry = 0
---array of draw objects
+--array of strings
 local lineinfo = {}
 
 for str in love.filesystem.lines(path) do
