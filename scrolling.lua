@@ -31,6 +31,7 @@ function love.update(dt)
 end
 
 function love.draw()
+	--first visible line
 	local lno = math.floor(ry / fh) + 1
 	if lno > #lineinfo then
 	return end
@@ -44,10 +45,8 @@ function love.draw()
 		local ox = 0
 		local first = false	
 		
-		if #lineinfo[i] == 0 then
-			if i == cy and cx == 1 then
-				love.graphics.rectangle("fill", 0, ly, font:getWidth(" "), fh)
-			end
+		if #lineinfo[i] == 0 and cy == i then
+			love.graphics.rectangle("fill", 0, ly, font:getWidth(" "), fh)
 		end
 		
 		while j <= #lineinfo[i] do
