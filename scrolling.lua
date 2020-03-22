@@ -31,8 +31,6 @@ function love.update(dt)
 end
 
 function love.draw()
-	local fh = font:getHeight()
-	--first visible line
 	local lno = math.floor(ry / fh) + 1
 	if lno > #lineinfo then
 	return end
@@ -45,6 +43,13 @@ function love.draw()
 		local j = 1
 		local ox = 0
 		local first = false	
+		
+		if #lineinfo[i] == 0 then
+			if i == cy and cx == 1 then
+				love.graphics.rectangle("fill", 0, ly, font:getWidth(" "), fh)
+			end
+		end
+		
 		while j <= #lineinfo[i] do
 			local c = lineinfo[i]:sub(j, j)
 			local w = font:getWidth(c)
