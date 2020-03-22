@@ -25,46 +25,47 @@ function love.wheelmoved(dx, dy)
 	end
 end
 
-function love.update()
-	if love.keyboard.isDown("d") then
-		rx = rx + 1
-	end
-	if love.keyboard.isDown("a") then
-		rx = rx - 1
-		if rx < 0 then
-			rx = 0
-		end
-	end
+function love.update(dt)
+
+	
 end
 
 function love.draw()
 	local fh = font:getHeight()
 	--first visible line
 	local lno = math.floor(ry / fh) + 1
+	if lno > #lineinfo then
+	return end
 	--screen line coordinate
 	local ly = lno * fh - (fh + ry)
 	for i = lno, #lineinfo do
 		if ly > wndh then
 		break end
-		local ox = 0
 		local lx
-		local first = false
-		for j = 1, #lineinfo[i] do
+		local j = 1
+		local ox = 0
+		local first = false	
+		while j <= #lineinfo[i] do
 			local c = lineinfo[i]:sub(j, j)
 			local w = font:getWidth(c)
 			if not first then
 				ox = ox + w
 				if ox > rx then
 					first = true
-					lx = ox - rx
-					--lx is the next char position
-					--lx - w is the last
-					love.graphics.print(c, lx - w, ly)
+					lx = ox - (rx + w)
+					--repeat last character
+					--this time drawing it
+					j = j - 1
 				end
 			elseif lx < wndw then
+				--draw cursor
+				if i == cy and j == cx then
+					love.graphics.rectangle("fill", lx, ly, w, fh)
+				end
 				love.graphics.print(c, lx, ly)
 				lx = lx + w			
 			else break end
+			j = j + 1
 		end
 		ly = ly + fh
 	end
