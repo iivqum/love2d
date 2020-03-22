@@ -5,10 +5,14 @@ local font = love.graphics.newFont("arial.ttf", 16)
 --visible region offsets
 local rx = 0
 local ry = 0
+--cursor offsets
+local cx = 1
+local cy = 1
 --array of strings
 local lineinfo = {}
 
 for str in love.filesystem.lines(path) do
+	print(#str)
 	table.insert(lineinfo, str)
 end
 
@@ -25,12 +29,69 @@ function love.wheelmoved(dx, dy)
 	end
 end
 
+local sumdt = 0
 function love.update(dt)
-
+	sumdt = sumdt + dt
+	if sumdt < 0.05 then
+		return
+	end
+	sumdt = 0
 	
+	if love.keyboard.isDown("d") then
+		cx = cx + 1
+		if cx > #lineinfo[cy] then
+			cx = #lineinfo[cy]
+		end
+	end
+	if love.keyboard.isDown("a") then
+		cx = cx - 1
+		if cx < 1 then
+			cx = 1
+		end
+	end
+	if love.keyboard.isDown("w") then
+		cy = cy - 1
+		if cy < 1 then
+			cy = 1
+		end		
+	end
+	if love.keyboard.isDown("s") then
+		cy = cy + 1
+		if cy > #lineinfo then
+			cy = #lineinfo
+		end		
+	end
 end
 
 function love.draw()
+	local fh = font:getHeight()
+	--correct region position
+	local cly = cy * fh
+	local cly2 = cly - fh
+	local ry2 = ry + wndh
+	
+	if cly2 < ry then
+		ry = ry - (ry - cly2)
+	elseif cly > ry2 then
+		ry = ry + (cly - ry2)
+	end
+	
+	local rx2 = rx + wndw
+	local clx = 0
+	local prv
+	
+	for i = 1, cx do
+		prv = font:getWidth(lineinfo[cy]:sub(i, i))
+		clx = clx + prv
+	end
+	
+	local clx2 = clx - prv
+	
+	if clx2 < rx then
+		rx = rx - (rx - clx2)
+	elseif clx > rx2 then
+		rx = rx + (clx - rx2)
+	end
 	--first visible line
 	local lno = math.floor(ry / fh) + 1
 	if lno > #lineinfo then
@@ -44,7 +105,7 @@ function love.draw()
 		local j = 1
 		local ox = 0
 		local first = false	
-		
+		--empty line condition
 		if #lineinfo[i] == 0 and cy == i then
 			love.graphics.rectangle("fill", 0, ly, font:getWidth(" "), fh)
 		end
