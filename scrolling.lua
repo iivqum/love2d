@@ -32,7 +32,7 @@ end
 local sumdt = 0
 function love.update(dt)
 	sumdt = sumdt + dt
-	if sumdt < 0.05 then
+	if sumdt < 0.01 then
 		return
 	end
 	sumdt = 0
@@ -40,7 +40,11 @@ function love.update(dt)
 	if love.keyboard.isDown("d") then
 		cx = cx + 1
 		if cx > #lineinfo[cy] then
-			cx = #lineinfo[cy]
+			if #lineinfo[cy] == 0 then
+				cx = 1
+			else
+				cx = #lineinfo[cy]
+			end
 		end
 	end
 	if love.keyboard.isDown("a") then
@@ -78,7 +82,7 @@ function love.draw()
 	
 	local rx2 = rx + wndw
 	local clx = 0
-	local prv
+	local prv = 0
 	
 	for i = 1, cx do
 		prv = font:getWidth(lineinfo[cy]:sub(i, i))
