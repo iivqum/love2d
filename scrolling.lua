@@ -45,7 +45,7 @@ function love.draw()
 	local ly = lno * fh - (fh + ry)
 	for i = lno, #lineinfo do
 		if ly > wndh then
-			break end
+		break end
 		local ox = 0
 		local lx
 		local first = false
