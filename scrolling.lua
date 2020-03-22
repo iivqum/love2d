@@ -56,10 +56,10 @@ function love.draw()
 				local lx = ox - (rx + w)
 				--find subsequent characters
 				for k = j, #lineinfo[i] do
-					local c = lineinfo[i]:sub(k, k)
 					if lx > wndw then
 						break
 					end
+					local c = lineinfo[i]:sub(k, k)
 					--draw character
 					love.graphics.print(c, lx, ly)
 					lx = lx + font:getWidth(c)
