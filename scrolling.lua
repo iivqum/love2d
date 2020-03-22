@@ -45,27 +45,24 @@ function love.draw()
 	local ly = lno * fh - (fh + ry)
 	for i = lno, #lineinfo do
 		if ly > wndh then
-			break
-		end
-		--find first visible character
+			break end
 		local ox = 0
+		local lx
+		local first = false
 		for j = 1, #lineinfo[i] do
-			local w = font:getWidth(lineinfo[i]:sub(j, j))
-			ox = ox + w
-			if ox > rx then
-				local lx = ox - (rx + w)
-				--find subsequent characters
-				for k = j, #lineinfo[i] do
-					if lx > wndw then
-						break
-					end
-					local c = lineinfo[i]:sub(k, k)
-					--draw character
-					love.graphics.print(c, lx, ly)
-					lx = lx + font:getWidth(c)
+			local c = lineinfo[i]:sub(j, j)
+			local w = font:getWidth(c)
+			if not first then
+				ox = ox + w
+				if ox > rx then
+					first = true
+					lx = ox - rx
+					love.graphics.print(c, lx - w, ly)
 				end
-				break
-			end
+			elseif lx < wndw then
+				love.graphics.print(c, lx, ly)
+				lx = lx + w			
+			else break end
 		end
 		ly = ly + fh
 	end
