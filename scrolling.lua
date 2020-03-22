@@ -57,6 +57,8 @@ function love.draw()
 				if ox > rx then
 					first = true
 					lx = ox - rx
+					--lx is the next char position
+					--lx - w is the last
 					love.graphics.print(c, lx - w, ly)
 				end
 			elseif lx < wndw then
