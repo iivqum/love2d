@@ -28,7 +28,7 @@ function text.mark()
 	}
 end
 
-function text.go(mark)
+function text.goto(mark)
 	pos = mark.pos
 	line = mark.ln
 end
@@ -73,21 +73,19 @@ function text.setcur(x, y)
 end
 
 function text.adv()
-	if text.eol() then
-		if not line.nxt then
-		return end
-		line = line.nxt
-		pos = 1
-	return end
+	if pos == #line.dta then
+		if line.nxt then
+			line = line.nxt
+			pos = 1
+		end
+		return true 
+	end
 	pos = pos + 1
+	return false
 end
 
-function text.getc()
+function text.get()
 	return line.dta:sub(pos, pos)
-end
-
-function text.eol()
-	return pos == #line.dta
 end
 
 return text
