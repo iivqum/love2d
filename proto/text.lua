@@ -2,7 +2,6 @@
 	
 	
 ]]
-
 local text = {}
 --head of double linked list
 --used for traversal
@@ -81,6 +80,10 @@ function text.adv()
 		pos = 1
 	return end
 	pos = pos + 1
+end
+
+function text.getc()
+	return line.dta:sub(pos, pos)
 end
 
 function text.eol()
