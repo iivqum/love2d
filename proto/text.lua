@@ -31,7 +31,11 @@ function text.insert(str)
 end
 
 function text.delete()
-
+	line.dta = table.concat({
+		line.dta:sub(1, pos)
+		line.dta:sub(pos + 1, #line.dta)	
+	})
+	text.movecur(-1, 0)
 end
 
 function text.movecur(dx, dy)
