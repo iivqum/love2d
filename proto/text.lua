@@ -28,7 +28,7 @@ function text.mark()
 	}
 end
 
-function text.goto(mark)
+function text.go(mark)
 	pos = mark.pos
 	line = mark.ln
 end
