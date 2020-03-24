@@ -4,22 +4,42 @@
 ]]
 
 local text = {}
---root of double linked list
---local head
+--head of double linked list
+--used for traversal
+local head
 --cursor line
 local line
 --cursor column position
 local pos = 1
 
 local function getline(n)
-	
+	local ln = head
+	for i = 1, n do
+		ln = ln.nxt
+		if not ln then
+		break end
+	end
+	return ln
+end
+
+function text.mark()
+	return {
+		pos = pos,
+		ln = line
+	}
+end
+
+function text.goto(mark)
+	pos = mark.pos
+	line = mark.ln
 end
 
 function text.line(str)
 	local ln = {}
 	ln.dta = str or ""
-	if not line then
-		line = ln
+	if not head then
+		head = ln
+		line = head
 	return end
 	line.prv = ln
 	ln.nxt = line
@@ -53,21 +73,18 @@ function text.setcur(x, y)
 	return true
 end
 
-function text.movecur(dx, dy)
-	if dx > 0 then
-		pos = math.min(#line.dta, pos + dx)
-	elseif dx < 0 then
-		pos = math.max(1, pos + dx)
-	end
-	if dy == 0 then
+function text.adv()
+	if text.eol() then
+		if not line.nxt then
+		return end
+		line = line.nxt
+		pos = 1
 	return end
-	local sig = dy / -d
-	for i = 1, math.abs(dy) do
-		local ln = getline(i * sig)
-		if not ln then
-		break end
-		line = ln
-	end
+	pos = pos + 1
+end
+
+function text.eol()
+	return pos == #line.dta
 end
 
 return text
