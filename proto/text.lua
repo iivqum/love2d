@@ -40,7 +40,7 @@ function text.insert(str)
 		str,
 		line.dta:sub(pos + 1, #line.dta)	
 	})
-	text.movecur(1, 0)
+	text.adv()
 end
 
 function text.delete()
@@ -48,7 +48,7 @@ function text.delete()
 		line.dta:sub(1, pos - 1)
 		line.dta:sub(pos + 1, #line.dta)	
 	})
-	text.movecur(-1, 0)
+	text.ret()
 end
 
 function text.adv()
@@ -71,6 +71,14 @@ function text.ret()
 	return true end
 	pos = pos - 1
 	return false
+end
+
+function text.get()
+	return line.dta:sub(pos, pos)
+end
+
+function text.eol()
+	return pos == #line.dta
 end
 
 return text
