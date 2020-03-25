@@ -14,13 +14,12 @@ local line
 --cursor column position
 local pos = 1
 
-function sinsert(dst, src, pos)
-	local ln = {
-		dst:sub(1, pos - 1),
+local function sinsert(dst, src, x)
+	return table.concat({
+		dst:sub(1, x),
 		src,
-		dst:sub(pos, #dst)
-	}	
-	return table.concat(ln)
+		dst:sub(x + 1, #dst)	
+	})
 end
 
 function text.clear()
@@ -56,7 +55,6 @@ end
 
 function text.insert(str)
 	local pbyte = {}
-	local left = false
 	local pos2 = 0
 	for i = 1, #str do
 		local c = str:sub(i, i)
@@ -64,7 +62,7 @@ function text.insert(str)
 			if pos2 > 0 then
 				line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
 				pbyte = {}
-				pos = pos + pos2
+				pos = 1
 			end
 			pos2 = 0
 			--insert on a new line
