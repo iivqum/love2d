@@ -7,7 +7,7 @@ local text = {}
 --head of double linked list
 --used for traversal
 local head
---marker for storing a position
+--marker for storing buffer position
 local mark = {}
 --cursor line
 local line
@@ -47,6 +47,7 @@ function text.line(str)
 		head = ln
 		line = ln
 	else
+		--FIX
 		line.prv = ln
 		line.nxt = line
 	end
@@ -56,38 +57,42 @@ end
 function text.insert(str)
 	local pbyte = {}
 	local left = false
+	local pos2 = 0
 	for i = 1, #str do
 		local c = str:sub(i, i)
 		if c == '\n' then
-			if left then
+			if pos2 > 0 then
 				line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
-				pchars = {}
-				left = false
+				pbyte = {}
+				pos = pos + pos2
 			end
-			pos = 1
-			--inserting on a new line
+			pos2 = 0
+			--insert on a new line
 			line = text.line()
 		else
-			pos = pos + 1
-			left = true
+			pos2 = pos2 + 1
 			table.insert(pbyte, c)
 		end
 	end
-	--add remaining chars to last line
-	if left then
-		line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
-	end
+	--if we didnt leave on a newline
+	--we still have more chars
+	if pos2 == 0 then
+	return end
+	line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
+	pos = pos + pos2
 end
 
 function text.delete()
 	local npos = pos - 1
-	if npos == 0 and line.prv then
-		local prv = line.prv
-		if line.nxt then
-			prv.nxt = line.nxt
-			line.nxt.prv = line.prv
+	if npos == 0 then
+		if line.prv then
+			local prv = line.prv
+			if line.nxt then
+				prv.nxt = line.nxt
+				line.nxt.prv = line.prv
+			end
+			prv = sinsert(prv.dta, line.dta:sub(1, #line.dta - 1), #prv.dta - 1)
 		end
-		prv = sinsert(prv.dta, line.dta:sub(1, #line.dta - 1), #prv.dta - 1)
 	return end
 	local ln = {
 		line.dta:sub(1, pos - 2),
