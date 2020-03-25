@@ -13,6 +13,21 @@ local line
 --cursor column position
 local pos = 1
 
+function sinsert(dst, src, pos)
+	local ln = {
+		dst:sub(1, pos - 1),
+		src,
+		dst:sub(pos, #dst)
+	}	
+	return table.concat(ln)
+end
+
+function text.clear()
+	head = nil
+	line = nil
+	pos = 1
+end
+
 function text.mark()
 	mark.pos = pos
 	mark.line = line
@@ -25,42 +40,47 @@ end
 
 function text.line(str)
 	local ln = {}
-	ln.dta = str or ""
+	str = str or ''
+	ln.dta = table.concat({str, '\n'})
 	if not head then
 		head = ln
-		line = head
-	return end
-	line.prv = ln
-	ln.nxt = line
+		line = ln
+	else
+		line.prv = ln
+		line.nxt = line
+	end
+	return ln
 end
 
 function text.insert(str)
 	local pchars = {}
+	local left = false
 	for i = 1, #str do
 		local c = str:sub(i, i)
-		if c == "\n" then
-			if #pchars > 0 then
-				line.dta = sinsert(line.dta, table.concat(pchars), pos)
+		if c == '\n' then
+			if left then
+				line.dta = sinsert(line.dta, table.concat(pchars), pos - 1)
 				pchars = {}
 			end
 			pos = 1
 			--inserting on a new line
 			line = text.line()
 		else
+			pos = pos + 1
+			left = true
 			table.insert(pchars, c)
 		end
 	end
 	--add remaining chars to last line
-	if #pchars > 0 then
-		line.dta = sinsert(line.dta, table.concat(pchars), pos)
+	if left then
+		line.dta = sinsert(line.dta, table.concat(pchars), pos - 1)
 	end
-	--text.adv()
 end
 
 function text.delete()
 	line.dta = table.concat({
-		line.dta:sub(1, pos - 1)
-		line.dta:sub(pos + 1, #line.dta)	
+	line.dta:sub(1, pos - 1),
+	line.dta:sub(pos + 1, #line.dta)	
 	})
 	text.ret()
 end
