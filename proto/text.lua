@@ -35,12 +35,32 @@ function text.line(str)
 end
 
 function text.insert(str)
-	line.dta = table.concat({
-		line.dta:sub(1, pos)
-		str,
+	local pchars = {}
+	for i = 1, #str do
+		local c = str:sub(i, i)
+		if c == "\n" then
+			if #pchars > 0 then
+				line.dta = table.concat({
+				line.dta:sub(1, pos),
+				table.concat(pchars),
+				line.dta:sub(pos + 1, #line.dta)	
+				})
+				pchars = {}
+			end
+			line = text.line()
+		else
+			table.insert(pchars, c)
+		end
+	end
+	--no newline, insert current line
+	if #pchars > 0 then
+		line.dta = table.concat({
+		line.dta:sub(1, pos),
+		table.concat(pchars),
 		line.dta:sub(pos + 1, #line.dta)	
-	})
-	text.adv()
+		})
+	end
+	--text.adv()
 end
 
 function text.delete()
