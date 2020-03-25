@@ -40,25 +40,19 @@ function text.insert(str)
 		local c = str:sub(i, i)
 		if c == "\n" then
 			if #pchars > 0 then
-				line.dta = table.concat({
-				line.dta:sub(1, pos),
-				table.concat(pchars),
-				line.dta:sub(pos + 1, #line.dta)	
-				})
+				line.dta = sinsert(line.dta, table.concat(pchars), pos)
 				pchars = {}
 			end
+			pos = 1
+			--inserting on a new line
 			line = text.line()
 		else
 			table.insert(pchars, c)
 		end
 	end
-	--no newline, insert current line
+	--add remaining chars to last line
 	if #pchars > 0 then
-		line.dta = table.concat({
-		line.dta:sub(1, pos),
-		table.concat(pchars),
-		line.dta:sub(pos + 1, #line.dta)	
-		})
+		line.dta = sinsert(line.dta, table.concat(pchars), pos)
 	end
 	--text.adv()
 end
