@@ -6,31 +6,21 @@ local text = {}
 --head of double linked list
 --used for traversal
 local head
+--marker for storing a position
+local mark = {}
 --cursor line
 local line
 --cursor column position
 local pos = 1
 
-local function getline(n)
-	local ln = head
-	for i = 1, n do
-		ln = ln.nxt
-		if not ln then
-		break end
-	end
-	return ln
-end
-
 function text.mark()
-	return {
-		pos = pos,
-		ln = line
-	}
+	mark.pos = pos
+	mark.line = line
 end
 
-function text.goto(mark)
+function text.rst()
 	pos = mark.pos
-	line = mark.ln
+	line = mark.line
 end
 
 function text.line(str)
@@ -61,31 +51,26 @@ function text.delete()
 	text.movecur(-1, 0)
 end
 
-function text.setcur(x, y)
-	local ln = getline(y)
-	if not ln then
-	return end
-	if x > #ln.dta then
-	return end
-	line = ln
-	pos = x
-	return true
-end
-
 function text.adv()
 	if pos == #line.dta then
 		if line.nxt then
 			line = line.nxt
 			pos = 1
-		end
-		return true 
-	end
+		end 
+	return true end
 	pos = pos + 1
 	return false
 end
 
-function text.get()
-	return line.dta:sub(pos, pos)
+function text.ret()
+	if pos == 1 then
+		if line.prv then
+			line = line.prv
+			pos = #line.dta
+		end 
+	return true end
+	pos = pos - 1
+	return false
 end
 
 return text
