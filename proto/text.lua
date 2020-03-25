@@ -1,5 +1,6 @@
 --[[
-	
+
+
 	
 ]]
 local text = {}
@@ -53,14 +54,15 @@ function text.line(str)
 end
 
 function text.insert(str)
-	local pchars = {}
+	local pbyte = {}
 	local left = false
 	for i = 1, #str do
 		local c = str:sub(i, i)
 		if c == '\n' then
 			if left then
-				line.dta = sinsert(line.dta, table.concat(pchars), pos - 1)
+				line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
 				pchars = {}
+				left = false
 			end
 			pos = 1
 			--inserting on a new line
@@ -68,21 +70,30 @@ function text.insert(str)
 		else
 			pos = pos + 1
 			left = true
-			table.insert(pchars, c)
+			table.insert(pbyte, c)
 		end
 	end
 	--add remaining chars to last line
 	if left then
-		line.dta = sinsert(line.dta, table.concat(pchars), pos - 1)
+		line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
 	end
 end
 
 function text.delete()
-	line.dta = table.concat({
-	line.dta:sub(1, pos - 1),
-	line.dta:sub(pos + 1, #line.dta)	
-	})
-	text.ret()
+	local npos = pos - 1
+	if npos == 0 and line.prv then
+		local prv = line.prv
+		if line.nxt then
+			prv.nxt = line.nxt
+			line.nxt.prv = line.prv
+		end
+		prv = sinsert(prv.dta, line.dta:sub(1, #line.dta - 1), #prv.dta - 1)
+	return end
+	local ln = {
+		line.dta:sub(1, pos - 2),
+		line.dta:sub(pos, #line.dta)
+	}
+	line.dta = table.concat(ln)
 end
 
 function text.adv()
