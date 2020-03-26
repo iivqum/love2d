@@ -66,12 +66,12 @@ function text.insert(str)
 			local new = line.dta:sub(pos, #line.dta)
 			line.dta = split
 			line = text.line(new)
-			text.advline()
 			if pos2 > 0 then
 				pbyte = {}
 				pos = 1
 				pos2 = 0
 			end
+			text.advline()
 		else
 			pos2 = pos2 + 1
 			table.insert(pbyte, c)
