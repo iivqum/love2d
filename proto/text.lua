@@ -50,11 +50,18 @@ function text.line(str)
 			line.nxt.prv = ln
 		end	
 		ln.prv = line
-		ln.next = line.nxt
-		
+		ln.nxt = line.nxt
 		line.nxt = ln
 	end
 	return ln
+end
+
+function text.insertc(c)
+	c = c:sub(1, 1)
+	if c == '\n' then
+		
+	return end
+	line.dta = sinsert(line.dta, c, pos - 1)
 end
 
 function text.insert(str)
@@ -63,23 +70,21 @@ function text.insert(str)
 	for i = 1, #str do
 		local c = str:sub(i, i)
 		if c == '\n' then
-			--TODO
-			--line splitting
+			local split = table.concat({line.dta:sub(1, pos - 1), table.concat(pbyte), '\n'})
+			local new = line.dta:sub(pos, #line.dta)
 			if pos2 > 0 then
-				line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
 				pbyte = {}
 				pos = 1
 				pos2 = 0
 			end
-			--insert on a new line
-			line = text.line()
+			line.dta = split
+			line = text.line(new)
+			text.advline()
 		else
 			pos2 = pos2 + 1
 			table.insert(pbyte, c)
 		end
 	end
-	--if we didnt leave on a newline
-	--we still have more chars
 	if pos2 == 0 then
 	return end
 	line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
@@ -106,8 +111,9 @@ end
 
 function text.advline()
 	if not line.nxt then
-	return end
+	return false end
 	line = line.nxt
+	return true
 end
 
 function text.adv()
