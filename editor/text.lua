@@ -29,13 +29,13 @@ function text.clear()
 end
 
 function text.text.mark()
-	text.mark.text.pos = text.pos
-	text.mark.text.line = text.line
+	text.mark.pos = text.pos
+	text.mark.line = text.line
 end
 
 function text.rst()
-	text.pos = text.mark.text.pos
-	text.line = text.mark.text.line
+	text.pos = text.mark.pos
+	text.line = text.mark.line
 end
 
 function text.gotop()
@@ -43,7 +43,7 @@ function text.gotop()
 	text.line = text.head
 end
 
-function text.text.line(s)
+function text.adline(s)
 	local ln = {}
 	s = s or ''
 	ln.data = table.concat({s, '\n'})
@@ -75,8 +75,8 @@ function text.insert(s)
 				text.pos = 1
 				text.pos2 = 0
 			end
-			text.line = text.text.line(new)
-			text.advtext.line()
+			text.line = text.adline(new)
+			text.adv()
 		else
 			text.pos2 = text.pos2 + 1
 			table.insert(pbyte, c)
