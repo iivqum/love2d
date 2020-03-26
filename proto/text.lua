@@ -113,6 +113,7 @@ function text.advline()
 	if not line.nxt then
 	return false end
 	line = line.nxt
+	pos = 1
 	return true
 end
 
