@@ -4,13 +4,13 @@
 	
 ]]
 local text = {
-	--text.head of double linked list
+	--head of double linked list
 	head = nil,
-	--text.marker for storing buffer text.position
+	--marker for storing buffer position
 	mark = {},
 	--cursor text.line
 	line = nil
-	--cursor column text.position
+	--cursor column position
 	pos = 1
 }
 
