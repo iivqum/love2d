@@ -38,10 +38,10 @@ function text.rst()
 	line = mark.line
 end
 
-function text.line(str)
+function text.line(s)
 	local ln = {}
-	str = str or ''
-	ln.dta = table.concat({str, '\n'})
+	s = s or ''
+	ln.dta = table.concat({s, '\n'})
 	if not head then
 		head = ln
 		line = ln
@@ -56,21 +56,21 @@ function text.line(str)
 	return ln
 end
 
-function text.insert(str)
+function text.insert(s)
 	local pbyte = {}
 	local pos2 = 0
-	for i = 1, #str do
-		local c = str:sub(i, i)
+	for i = 1, #s do
+		local c = s:sub(i, i)
 		if c == '\n' then
 			local split = table.concat({line.dta:sub(1, pos - 1), table.concat(pbyte), '\n'})
 			local new = line.dta:sub(pos, #line.dta)
 			line.dta = split
-			line = text.line(new)
 			if pos2 > 0 then
 				pbyte = {}
 				pos = 1
 				pos2 = 0
 			end
+			line = text.line(new)
 			text.advline()
 		else
 			pos2 = pos2 + 1
@@ -85,20 +85,23 @@ function text.insert(str)
 end
 
 function text.delete()
-	if pos == 1 then
-		if line.prv then
-			local prv = line.prv
-			if line.nxt then
-				prv.nxt = line.nxt
-				line.nxt.prv = line.prv
-			end
-			prv = sinsert(prv.dta, line.dta:sub(1, #line.dta - 1), #prv.dta - 1)
-		end
+	if pos > 1 then
+		line.dta = table.concat({
+			line.dta:sub(1, pos - 2),
+			line.dta:sub(pos, #line.dta)	
+		})	
 	return end
-	line.dta = table.concat({
-		line.dta:sub(1, pos - 2),
-		line.dta:sub(pos, #line.dta)	
-	})
+	local prv = line.prv
+	if not prv then
+	return end
+	if line.nxt then
+		prv.nxt = line.nxt
+		line.nxt.prv = prv
+	end
+	local s = line.dta:sub(1, #line.dta - 1)
+	line = prv
+	pos = #prv.dta
+	text.insert(s)
 end
 
 function text.advline()
