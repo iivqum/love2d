@@ -64,14 +64,14 @@ function text.insert(str)
 		if c == '\n' then
 			local split = table.concat({line.dta:sub(1, pos - 1), table.concat(pbyte), '\n'})
 			local new = line.dta:sub(pos, #line.dta)
+			line.dta = split
+			line = text.line(new)
+			text.advline()
 			if pos2 > 0 then
 				pbyte = {}
 				pos = 1
 				pos2 = 0
 			end
-			line.dta = split
-			line = text.line(new)
-			text.advline()
 		else
 			pos2 = pos2 + 1
 			table.insert(pbyte, c)
@@ -79,13 +79,13 @@ function text.insert(str)
 	end
 	if pos2 == 0 then
 	return end
+	--remaining chars
 	line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
 	pos = pos + pos2
 end
 
 function text.delete()
-	local npos = pos - 1
-	if npos == 0 then
+	if pos == 1 then
 		if line.prv then
 			local prv = line.prv
 			if line.nxt then
