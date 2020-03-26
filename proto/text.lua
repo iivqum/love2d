@@ -56,14 +56,6 @@ function text.line(str)
 	return ln
 end
 
-function text.insertc(c)
-	c = c:sub(1, 1)
-	if c == '\n' then
-		
-	return end
-	line.dta = sinsert(line.dta, c, pos - 1)
-end
-
 function text.insert(str)
 	local pbyte = {}
 	local pos2 = 0
