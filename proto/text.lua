@@ -46,9 +46,13 @@ function text.line(str)
 		head = ln
 		line = ln
 	else
-		--FIX
-		line.prv = ln
-		line.nxt = line
+		if line.nxt then
+			line.nxt.prv = ln
+		end	
+		ln.prv = line
+		ln.next = line.nxt
+		
+		line.nxt = ln
 	end
 	return ln
 end
@@ -59,12 +63,14 @@ function text.insert(str)
 	for i = 1, #str do
 		local c = str:sub(i, i)
 		if c == '\n' then
+			--TODO
+			--line splitting
 			if pos2 > 0 then
 				line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
 				pbyte = {}
 				pos = 1
+				pos2 = 0
 			end
-			pos2 = 0
 			--insert on a new line
 			line = text.line()
 		else
@@ -92,11 +98,16 @@ function text.delete()
 			prv = sinsert(prv.dta, line.dta:sub(1, #line.dta - 1), #prv.dta - 1)
 		end
 	return end
-	local ln = {
+	line.dta = table.concat({
 		line.dta:sub(1, pos - 2),
-		line.dta:sub(pos, #line.dta)
-	}
-	line.dta = table.concat(ln)
+		line.dta:sub(pos, #line.dta)	
+	})
+end
+
+function text.advline()
+	if not line.nxt then
+	return end
+	line = line.nxt
 end
 
 function text.adv()
