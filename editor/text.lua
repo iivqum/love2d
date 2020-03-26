@@ -3,16 +3,16 @@
 
 	
 ]]
-local text = {}
---head of double linked list
---used for traversal
-local head
---marker for storing buffer position
-local mark = {}
---cursor line
-local line
---cursor column position
-local pos = 1
+local text = {
+	--head of double linked list
+	head = nil,
+	--marker for storing buffer position
+	mark = nil,
+	--cursor line
+	line = nil
+	--cursor column position
+	pos = 1
+}
 
 local function sinsert(dst, src, x)
 	return table.concat({
@@ -46,17 +46,17 @@ end
 function text.line(s)
 	local ln = {}
 	s = s or ''
-	ln.dta = table.concat({s, '\n'})
+	ln.data = table.concat({s, '\n'})
 	if not head then
 		head = ln
 		line = ln
 	else
-		if line.nxt then
-			line.nxt.prv = ln
+		if line.next then
+			line.next.prev = ln
 		end	
-		ln.prv = line
-		ln.nxt = line.nxt
-		line.nxt = ln
+		ln.prev = line
+		ln.next = line.next
+		line.next = ln
 	end
 	return ln
 end
@@ -67,9 +67,9 @@ function text.insert(s)
 	for i = 1, #s do
 		local c = s:sub(i, i)
 		if c == '\n' then
-			local split = table.concat({line.dta:sub(1, pos - 1), table.concat(pbyte), '\n'})
-			local new = line.dta:sub(pos, #line.dta)
-			line.dta = split
+			local split = table.concat({line.data:sub(1, pos - 1), table.concat(pbyte), '\n'})
+			local new = line.data:sub(pos, #line.data)
+			line.data = split
 			if pos2 > 0 then
 				pbyte = {}
 				pos = 1
@@ -85,42 +85,42 @@ function text.insert(s)
 	if pos2 == 0 then
 	return end
 	--remaining chars
-	line.dta = sinsert(line.dta, table.concat(pbyte), pos - 1)
+	line.data = sinsert(line.data, table.concat(pbyte), pos - 1)
 	pos = pos + pos2
 end
 
 function text.delete()
 	if pos > 1 then
-		line.dta = table.concat({
-			line.dta:sub(1, pos - 2),
-			line.dta:sub(pos, #line.dta)	
+		line.data = table.concat({
+			line.data:sub(1, pos - 2),
+			line.data:sub(pos, #line.data)	
 		})	
 	return end
-	local prv = line.prv
-	if not prv then
+	local prev = line.prev
+	if not prev then
 	return end
-	if line.nxt then
-		prv.nxt = line.nxt
-		line.nxt.prv = prv
+	if line.next then
+		prev.next = line.next
+		line.next.prev = prev
 	end
-	local s = line.dta:sub(1, #line.dta - 1)
-	line = prv
-	pos = #prv.dta
+	local s = line.data:sub(1, #line.data - 1)
+	line = prev
+	pos = #prev.data
 	text.insert(s)
 end
 
 function text.advline()
-	if not line.nxt then
+	if not line.next then
 	return false end
-	line = line.nxt
+	line = line.next
 	pos = 1
 	return true
 end
 
 function text.adv()
-	if pos == #line.dta then
-		if line.nxt then
-			line = line.nxt
+	if pos == #line.data then
+		if line.next then
+			line = line.next
 			pos = 1
 		end 
 	return true end
@@ -130,9 +130,9 @@ end
 
 function text.ret()
 	if pos == 1 then
-		if line.prv then
-			line = line.prv
-			pos = #line.dta
+		if line.prev then
+			line = line.prev
+			pos = #line.data
 		end 
 	return true end
 	pos = pos - 1
@@ -140,11 +140,11 @@ function text.ret()
 end
 
 function text.get()
-	return line.dta:sub(pos, pos)
+	return line.data:sub(pos, pos)
 end
 
 function text.eol()
-	return pos == #line.dta
+	return pos == #line.data
 end
 
 return text
