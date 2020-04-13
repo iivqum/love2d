@@ -4,6 +4,10 @@
 	
 ]]
 
+local function insert_immutable(dst, src, x)
+	return table.concat({dst:sub(1, x), src, dst:sub(x + 1, #dst)})
+end
+
 local text = {}
 
 setfenv(1, text)
@@ -12,10 +16,6 @@ local head = nil
 local line = nil
 local mark = {}
 local pos = 1
-
-local function sinsert(dst, src, x)
-	return table.concat({dst:sub(1, x), src, dst:sub(x + 1, #dst)})
-end
 
 function insert_line(s)
 	local ln = {}
@@ -49,7 +49,7 @@ function insert(s)
 				pos2 = 0
 			end
 			line = insert_line(new)
-			adv()
+			move(1)
 		else
 			pos2 = pos2 + 1
 			table.insert(pbyte, c)
@@ -58,7 +58,7 @@ function insert(s)
 	if pos2 == 0 then
 	return end
 	--remaining chars
-	line.data = sinsert(line.data, table.concat(pbyte), pos - 1)
+	line.data = insert_immutable(line.data, table.concat(pbyte), pos - 1)
 	pos = pos + pos2
 end
 
@@ -79,9 +79,24 @@ function delete()
 	insert(s)
 end
 
-function move()
+function move(op)
+	if op == -1 then
+		if pos == 1 then
+			line = line.prev or line
+		return end
+		pos = pos - 1
+	elseif op == 1 then
+		if pos == #line.data then
+			line = line.next or line
+		return end
+		pos = pos + 1	
+	end	
+end
+
+function read()
 
 
 end
+
 
 return text
