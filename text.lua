@@ -8,6 +8,12 @@ local function insert_immutable(dst, src, x)
 	return table.concat({dst:sub(1, x), src, dst:sub(x + 1, #dst)})
 end
 
+local function sign(n)
+	if n >= 0 then
+	return 1
+	return -1
+end
+
 local text = {}
 
 setfenv(1, text)
@@ -80,17 +86,13 @@ function delete()
 end
 
 function move(op)
-	if op == -1 then
-		if pos == 1 then
-			if line.prev then line = line.prev end
-		return end
-		pos = pos - 1
-	elseif op == 1 then
-		if pos == #line.data then
-			if line.next then line = line.next end
-		return end
-		pos = pos + 1	
+	op = sign(op)
+	if op == -1 and pos == 1 and line.prev then
+		line = line.prev
+	elseif op == 1 and pos == #line.data and line.next then
+		line = line.next
 	end	
+	pos = pos + op
 end
 
 function read()
