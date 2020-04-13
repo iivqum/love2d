@@ -20,8 +20,43 @@ setfenv(1, text)
 
 local head = nil
 local line = nil
-local mark = {}
 local pos = 1
+
+local mark_row = nil
+local mark_col = nil
+
+--[[
+	basic linked list traversal
+	should optimize this somehow
+]]
+
+function mark()
+	mark_row = 1
+	local ptr = head
+	while ptr do
+		if ptr == line then
+		break end
+		mark_row = mark_row + 1
+		ptr = ptr.next
+	end
+	mark_col = pos
+end
+
+function go_to_mark()
+	local ptr = head
+	local i = 1
+	while ptr do
+		if i == mark_row then
+			if mark_col >= #ptr.data then
+			return false end
+			line = ptr
+			pos = mark_col
+		break end
+		i = i + 1
+		ptr = ptr.next
+	end
+	return true
+end
 
 function insert_line(s)
 	local ln = {}
@@ -41,16 +76,16 @@ function insert_line(s)
 end
 
 function insert(s)
-	local pbyte = {}
+	local bytes = {}
 	local pos2 = 0
 	for i = 1, #s do
 		local c = s:sub(i, i)
 		if c == '\n' then
-			local split = table.concat({line.data:sub(1, pos - 1), table.concat(pbyte), '\n'})
+			local split = table.concat({line.data:sub(1, pos - 1), table.concat(bytes), '\n'})
 			local new = line.data:sub(pos, #line.data)
 			line.data = split
 			if pos2 > 0 then
-				pbyte = {}
+				bytes = {}
 				pos = 1
 				pos2 = 0
 			end
@@ -58,13 +93,13 @@ function insert(s)
 			move(1)
 		else
 			pos2 = pos2 + 1
-			table.insert(pbyte, c)
+			table.insert(bytes, c)
 		end
 	end
 	if pos2 == 0 then
 	return end
 	--remaining chars
-	line.data = insert_immutable(line.data, table.concat(pbyte), pos - 1)
+	line.data = insert_immutable(line.data, table.concat(bytes), pos - 1)
 	pos = pos + pos2
 end
 
