@@ -25,16 +25,16 @@ function insert_line(s)
 	local ln = {}
 	s = s or ''
 	ln.data = table.concat({s, '\n'})
-	if not text.head then
-		text.head = ln
-		text.line = ln
+	if not head then
+		head = ln
+		line = ln
 	else
-		if text.line.next then
-			text.line.next.prev = ln
+		if line.next then
+			line.next.prev = ln
 		end	
-		ln.prev = text.line
-		ln.next = text.line.next
-		text.line.next = ln
+		ln.prev = line
+		ln.next = line.next
+		line.next = ln
 	end
 	return ln
 end
