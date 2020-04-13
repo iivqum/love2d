@@ -14,11 +14,7 @@ local mark = {}
 local pos = 1
 
 local function sinsert(dst, src, x)
-	return table.concat({
-		dst:sub(1, x),
-		src,
-		dst:sub(x + 1, #dst)	
-	})
+	return table.concat({dst:sub(1, x), src, dst:sub(x + 1, #dst)})
 end
 
 function insert_line(s)
@@ -68,10 +64,7 @@ end
 
 function delete()
 	if pos > 1 then
-		line.data = table.concat({
-			line.data:sub(1, pos - 2),
-			line.data:sub(pos, #line.data)	
-		})	
+		line.data = table.concat({line.data:sub(1, pos - 2), line.data:sub(pos, #line.data)})	
 	return end
 	local prev = line.prev
 	if not prev then
@@ -84,6 +77,11 @@ function delete()
 	line = prev
 	pos = #prev.data
 	insert(s)
+end
+
+function move()
+
+
 end
 
 return text
