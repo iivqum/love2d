@@ -18,7 +18,7 @@ local function sign(n)
 	return -1
 end
 
-local text = {}
+local text = setmetatable({}, {__index == _G})
 
 setfenv(1, text)
 
