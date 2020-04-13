@@ -51,11 +51,10 @@ function go_to_mark()
 			return false end
 			line = ptr
 			pos = mark_col
-		break end
+		return true end
 		i = i + 1
 		ptr = ptr.next
 	end
-	return true
 end
 
 function insert_line(s)
