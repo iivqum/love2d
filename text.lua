@@ -125,7 +125,7 @@ function move(op)
 		line = line.prev
 	elseif op == 1 and pos == #line.data and line.next then
 		line = line.next
-	end	
+	else return end
 	pos = pos + op
 end
 
