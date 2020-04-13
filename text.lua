@@ -82,21 +82,19 @@ end
 function move(op)
 	if op == -1 then
 		if pos == 1 then
-			line = line.prev or line
+			if line.prev then line = line.prev end
 		return end
 		pos = pos - 1
 	elseif op == 1 then
 		if pos == #line.data then
-			line = line.next or line
+			if line.next then line = line.next end
 		return end
 		pos = pos + 1	
 	end	
 end
 
 function read()
-
-
+	return line.data:sub(pos, pos)
 end
-
 
 return text
