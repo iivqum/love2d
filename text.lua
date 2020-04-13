@@ -28,14 +28,13 @@ function insert_line(s)
 	if not head then
 		head = ln
 		line = ln
-	else
-		if line.next then
-			line.next.prev = ln
-		end	
-		ln.prev = line
-		ln.next = line.next
-		line.next = ln
-	end
+	return ln
+	if line.next then
+		line.next.prev = ln
+	end	
+	ln.prev = line
+	ln.next = line.next
+	line.next = ln
 	return ln
 end
 
