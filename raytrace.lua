@@ -1,5 +1,5 @@
-local scnw = 512
-local scnh = 512
+local scnw = 256
+local scnh = 256
 
 local image = love.graphics.newCanvas(scnw,scnh)
 local asp = scnw/scnh
@@ -66,12 +66,12 @@ function RayHitSphere(ro,rd,o,r,tmin,tmax)
 	local d2 = math.sqrt(d)
 	a = 1/(2*a)
 	local root = (-b-d2)*a
-	local root2 = (-b+d2)*a
 	if root>1e-3 and root<math.huge then
 		return root
 	end
-	if root2>1e-3 and root2<math.huge then
-		return root2
+	root = (-b+d2)*a
+	if root>1e-3 and root<math.huge then
+		return root
 	end
 end
 
@@ -109,7 +109,7 @@ function AddSphere(x,y,z,radius)
 		r = radius,
 		HitFunc = function(self,ro,rd,tmin,tmax)
 			local t = RayHitSphere(ro,rd,self.p,self.r,tmin,tmax)
-			if t and t>0.001 then
+			if t then
 				local rec = {}
 				rec.t = t
 				rec.p = P3D(rd.x,rd.y,rd.z)
@@ -124,7 +124,7 @@ function AddSphere(x,y,z,radius)
 	})
 end
 
-function Ray(ro,rd,depth,isprim)
+function Ray(ro,rd,depth)
 	if depth<=0 then
 		return P3D(0,0,0)
 	end
@@ -138,12 +138,12 @@ function Ray(ro,rd,depth,isprim)
 		end
 	end
 	if rec then
-		local s = RandPointInSphere()
-		PAdd(s,rec.n)
-		local col = Ray(rec.p,s,depth-1,false)
+		local s = PAdd(rec.p,PAdd(rec.n,RandPointInSphere()))
+		local col = Ray(rec.p,PSub(s,rec.p),depth-1,false)
 		PScl(col,0.5)
 		return col
 	end
+	if 1 then return P3D(1,1,1) end
 	t = 0.5*(rd.y)+1
 	local c1 = P3D(1,1,1)
 	local c2 = P3D(0.5,0.7,1)
