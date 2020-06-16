@@ -4,7 +4,7 @@ local scnh = 256
 local image = love.graphics.newCanvas(scnw,scnh)
 local asp = scnw/scnh
 
-local aa_samples = 1
+local aa_samples = 10
 local objects = {}
 
 function P3D(x,y,z)
@@ -75,27 +75,31 @@ function RayHitSphere(ro,rd,o,r,tmin,tmax)
 	end
 end
 
-function RayHitPlane(ro,rd,p,n,tmin)
+function RayHitPlane(ro,rd,p,n)
 	local d = PDot(p,n)
 	local denom = PDot(n,rd)
-	if math.abs(denom)<0.001 then
+	if math.abs(denom)<1e-3 then
 		return
 	end
-	return (PDot(n,ro)+d)/denom
+	local t = (PDot(n,ro)+d)/denom
+	if t<=0 then
+		return
+	end
+	return t
 end
 
 function AddPlane(x,y,z,nx,ny,nz)
 	table.insert(objects, {
 		p = P3D(x,y,z),
 		n = P3D(nx,ny,nz),
-		HitFunc = function(self,ro,rd,tmin,tmax)
-			local t = RayHitPlane(ro,rd,self.p,self.n,tmin)
-			if t and math.abs(t)>0.001 then
+		HitFunc = function(self,ro,rd)
+			local t = RayHitPlane(ro,rd,self.p,self.n)
+			if t then
 				local rec = {}
 				rec.t = t
 				rec.p = P3D(rd.x,rd.y,rd.z)
 				PScl(rec.p,t)
-				PAdd(rec.p,ro)
+				rec.p = PAdd(rec.p,ro)
 				rec.n = self.n
 				return rec
 			end
@@ -107,14 +111,14 @@ function AddSphere(x,y,z,radius)
 	table.insert(objects, {
 		p = P3D(x,y,z),
 		r = radius,
-		HitFunc = function(self,ro,rd,tmin,tmax)
-			local t = RayHitSphere(ro,rd,self.p,self.r,tmin,tmax)
+		HitFunc = function(self,ro,rd)
+			local t = RayHitSphere(ro,rd,self.p,self.r)
 			if t then
 				local rec = {}
 				rec.t = t
 				rec.p = P3D(rd.x,rd.y,rd.z)
 				PScl(rec.p,t)
-				PAdd(rec.p,ro)				
+				rec.p = PAdd(rec.p,ro)				
 				rec.n = PSub(rec.p,self.p)
 				--awfulness
 				PScl(rec.n, 1/self.r)		
@@ -154,7 +158,7 @@ end
 
 AddSphere(0,0,-30, 10)
 AddSphere(0,-110,-30, 100)
---AddPlane(0,-10,0, 0,-1,0)
+--AddPlane(0,-10,0, 0,1,0)
 
 love.window.setMode(scnw,scnh)
 love.graphics.setCanvas(image)
@@ -171,7 +175,7 @@ for j=0,scnh-1 do
 		raydir.x = u
 		raydir.y = v
 		raydir.z = -1
-		local col = Ray(rayorigin,raydir,50)
+		local col = Ray(rayorigin,raydir,10)
 		ar = ar+col.x
 		ag = ag+col.y
 		ab = ab+col.z
