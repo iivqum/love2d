@@ -1,10 +1,10 @@
-local scnw = 256
-local scnh = 256
+local scnw = 512
+local scnh = 512
 
 local image = love.graphics.newCanvas(scnw,scnh)
 local asp = scnw/scnh
 
-local aa_samples = 10
+local aa_samples = 4
 local objects = {}
 
 function P3D(x,y,z)
@@ -52,6 +52,12 @@ function RandPointInSphere()
 			return p
 		end
 	end
+	--[[
+	local theta = RandFract()*2*math.pi
+	local z = RandFractSign()
+	local r = math.sqrt(1-z*z)
+	return P3D(r*math.cos(theta),r*math.sin(theta),z)
+	]]
 end
 
 function RayHitSphere(ro,rd,o,r,tmin,tmax)
@@ -92,9 +98,9 @@ function AddPlane(x,y,z,nx,ny,nz)
 	table.insert(objects, {
 		p = P3D(x,y,z),
 		n = P3D(nx,ny,nz),
-		HitFunc = function(self,ro,rd)
+		HitFunc = function(self,ro,rd,tmin)
 			local t = RayHitPlane(ro,rd,self.p,self.n)
-			if t then
+			if t and t<tmin then
 				local rec = {}
 				rec.t = t
 				rec.p = P3D(rd.x,rd.y,rd.z)
@@ -111,9 +117,9 @@ function AddSphere(x,y,z,radius)
 	table.insert(objects, {
 		p = P3D(x,y,z),
 		r = radius,
-		HitFunc = function(self,ro,rd)
+		HitFunc = function(self,ro,rd,tmin)
 			local t = RayHitSphere(ro,rd,self.p,self.r)
-			if t then
+			if t and t<tmin then
 				local rec = {}
 				rec.t = t
 				rec.p = P3D(rd.x,rd.y,rd.z)
@@ -135,14 +141,15 @@ function Ray(ro,rd,depth)
 	local t = math.huge
 	local rec
 	for k,obj in pairs(objects) do
-		local r = obj.HitFunc(obj,ro,rd,0.001,t)
-		if r and r.t<t then
+		local r = obj.HitFunc(obj,ro,rd,t)
+		if r then
 			t = r.t
 			rec = r
 		end
 	end
 	if rec then
-		local s = PAdd(rec.p,PAdd(rec.n,RandPointInSphere()))
+		local d = RandPointInSphere()
+		local s = PAdd(rec.p,PAdd(rec.n,d))
 		local col = Ray(rec.p,PSub(s,rec.p),depth-1,false)
 		PScl(col,0.5)
 		return col
@@ -157,14 +164,23 @@ function Ray(ro,rd,depth)
 end
 
 AddSphere(0,0,-30, 10)
-AddSphere(0,-110,-30, 100)
---AddPlane(0,-10,0, 0,1,0)
+--AddSphere(0,-1010,-30, 1000)
+AddPlane(0,-10,0, 0,1,0)
 
 love.window.setMode(scnw,scnh)
 love.graphics.setCanvas(image)
 --love.graphics.setBlendMode("replace","alphamultiply")
 local rayorigin = P3D(0,0,0)
 local raydir = P3D(0,0,0)
+
+function Clamp(n,min,max)
+	if n<min then
+		return min
+	elseif n>max then
+		return max
+	end
+	return n
+end
 
 for i=0,scnw-1 do
 for j=0,scnh-1 do
@@ -186,7 +202,7 @@ for j=0,scnh-1 do
 	--ar = ar/aa_samples
 	--ag = ag/aa_samples
 	--ab = ab/aa_samples
-	ColorPixel(i,j,ar,ag,ab)
+	ColorPixel(i,j,Clamp(ar,0,1),Clamp(ag,0,1),Clamp(ab,0,1))
 end
 end
 
